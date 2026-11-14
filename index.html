@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Business Partner — Admin</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--acc:#3fa9ad;--acc2:#e6f4f4;--mag:#c4127a;--pur:#6b2a8c;--grey:#77787b;--lg:#eeeff0;--ink:#231f20;--gold:#f2b631;--ok:#5c9e2f}
+*{box-sizing:border-box}body{margin:0;font-family:"Fira Sans",system-ui,sans-serif;color:var(--ink);background:#fff;font-weight:300}
+header{display:flex;align-items:stretch;border-bottom:3px solid var(--acc)}
+header .lv{background:linear-gradient(120deg,var(--pur),var(--mag));color:#fff;font-weight:500;font-size:24px;padding:14px 20px}
+header h1{margin:0;align-self:center;padding-left:16px;font-weight:500;font-size:24px;color:#4d4d4f}
+header .r{margin-left:auto;align-self:center;margin-right:16px;display:flex;gap:8px}
+button{font:inherit;font-weight:500;cursor:pointer;border-radius:4px}
+.btn{border:0;background:var(--acc);color:#fff;padding:8px 14px}
+.btn.l{background:#fff;color:#4d4d4f;border:1px solid #c9cacc}
+main{max-width:1200px;margin:0 auto;padding:16px 22px 50px}
+.login{max-width:420px;margin:60px auto;text-align:center}
+.login input{font:inherit;width:100%;padding:10px 12px;border:1.5px solid var(--acc);border-radius:4px;margin:12px 0}
+.levels{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.levels button{border:1.5px solid var(--acc);background:#fff;color:var(--acc);padding:7px 14px;border-radius:20px}
+.levels button.on{background:var(--acc);color:#fff}
+.levels button small{opacity:.75;margin-left:4px}
+.empty{color:var(--grey);padding:20px 0}
+table.mx{border-collapse:collapse;width:100%;font-size:14px;margin-bottom:20px}
+table.mx th,table.mx td{border:1px solid #d5d6d7;padding:7px 9px;text-align:left;vertical-align:top}
+table.mx th{background:var(--acc2);font-weight:600}
+table.mx td.st{width:210px}
+.who b{font-weight:600;font-size:15px}.who div{font-size:12.5px;color:var(--grey)}
+.who a{color:var(--acc);text-decoration:none;font-size:12.5px}
+.chip{display:inline-block;padding:3px 9px;border-radius:12px;font-size:12.5px;cursor:pointer;border:1px solid transparent;white-space:nowrap}
+.chip.done{background:#eaf4df;color:#3d6e1c;border-color:#bcd9a2}
+.chip.prog{background:#fdf0d5;color:#8a6200;border-color:#f0d58e}
+.chip.none{background:var(--lg);color:#a0a1a3;cursor:default}
+.chip .c{margin-left:4px}
+.detail{border:1px solid #d5d6d7;border-radius:6px;padding:16px 18px;background:#fbfbfb}
+.detail h3{margin:0 0 4px;font-weight:500}
+.detail .meta{color:var(--grey);font-size:13.5px;margin-bottom:12px}
+.scores{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.scores span{background:var(--acc2);padding:3px 9px;border-radius:10px;font-size:13px}
+.ans{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px;margin-bottom:14px}
+.ex{background:#fff;border:1px solid #e3e4e5;border-radius:4px;padding:8px 12px}
+.ex h4{margin:0 0 6px;font-size:14px;font-weight:600;color:var(--acc)}
+.ex div{font-size:14px;line-height:1.45;border-bottom:1px dashed #eee;padding:2px 0}
+.ex div i{color:var(--grey);font-style:normal;margin-right:6px;font-size:12.5px}
+.ex .emptyv{color:#c0392b}
+textarea{font:inherit;width:100%;min-height:90px;padding:8px 10px;border:1px solid #c9cacc;border-radius:4px}
+.add{margin-top:26px;border-top:1px solid #e3e4e5;padding-top:16px}
+.add h3{font-weight:500;margin:0 0 8px}
+.add form{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.add input,.add select{font:inherit;padding:7px 9px;border:1px solid #c9cacc;border-radius:4px}
+.note{font-size:13.5px;color:var(--grey);margin-top:8px}
+.ok{color:#2e7d32}.err{color:#c0392b}
+.code{font-family:monospace;background:var(--lg);padding:1px 6px;border-radius:3px}
+footer{text-align:center;color:var(--grey);font-size:12px;padding:20px}
+</style></head><body>
+<header><div class="lv">BP</div><h1>Business Partner · Admin</h1><div class="r" id="hdr" style="display:none"><button class="btn l" onclick="load()">↻ Refresh</button><button class="btn l" onclick="logout()">Log out</button></div></header>
+<main id="app"></main>
+<footer>Valentyna Hordiienko · Middle Learning Architect</footer>
+<script>
+const SB_URL="https://zuegojpfhgigsvyrnymt.supabase.co",SB_KEY="sb_publishable__Xn8xRhne9Hp2ckaXu6xCQ_MOe52bng";
+const LEVELS=["A1","A2","A2+","B1","B1+","B2","B2+","C1"];
+const app=document.getElementById("app");
+let KEY="",STUDENTS=[],OVER=[],LEVEL=null,SEL=null;
+try{KEY=localStorage.getItem("bp_admin_key")||""}catch(e){}
+const rpc=(f,b)=>fetch(SB_URL+"/rest/v1/rpc/"+f,{method:"POST",headers:{apikey:SB_KEY,"Content-Type":"application/json"},body:JSON.stringify(b)}).then(async r=>{const t=await r.text();if(!r.ok)throw new Error(t);return t?JSON.parse(t):null});
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const short=l=>l.replace(/^BP\s+\S+\s+/,"");
+const lessonNo=l=>{const m=l.match(/(\d+\.\d+|W\d+)/);return m?m[1]:l};
+const fmtDate=d=>d?new Date(d).toLocaleString("uk-UA",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
+
+function loginView(msg){
+ document.getElementById("hdr").style.display="none";
+ app.innerHTML=`<div class="login"><h2 style="font-weight:500">Вхід для вчителя</h2><p class="note">Введіть ключ адміністратора.</p>
+ <input id="k" type="password" placeholder="Admin key" autocomplete="current-password"><button class="btn" id="go" style="width:100%;padding:10px">Увійти</button>
+ <p class="err">${msg||""}</p></div>`;
+ const k=document.getElementById("k");k.focus();
+ const go=()=>{KEY=k.value.trim();load()};document.getElementById("go").onclick=go;k.onkeydown=e=>{if(e.key==="Enter")go()};
+}
+function logout(){KEY="";try{localStorage.removeItem("bp_admin_key")}catch(e){};loginView()}
+async function load(){
+ if(!KEY)return loginView();
+ app.innerHTML=`<p class="note">Loading…</p>`;
+ try{[STUDENTS,OVER]=await Promise.all([rpc("admin_students",{p_key:KEY}),rpc("admin_overview",{p_key:KEY})])}
+ catch(e){return loginView(/not allowed/.test(e.message)?"Невірний ключ.":"Немає з’єднання з базою.")}
+ try{localStorage.setItem("bp_admin_key",KEY)}catch(e){}
+ document.getElementById("hdr").style.display="flex";
+ if(!LEVEL){LEVEL=(LEVELS.find(l=>STUDENTS.some(s=>s.level===l)))||"A2+"}
+ render();
+}
+function render(){
+ const lv=LEVELS.map(l=>{const n=STUDENTS.filter(s=>s.level===l).length;return `<button class="${l===LEVEL?"on":""}" data-l="${l}">${l}<small>${n?"· "+n:""}</small></button>`}).join("");
+ const st=STUDENTS.filter(s=>s.level===LEVEL);
+ const lessons=[...new Set(OVER.filter(o=>st.some(s=>s.slug===o.slug)).map(o=>o.lesson))].sort((a,b)=>lessonNo(a).localeCompare(lessonNo(b),undefined,{numeric:true}));
+ let mx="";
+ if(!st.length)mx=`<p class="empty">На рівні ${LEVEL} ще немає студентів. Додайте нижче.</p>`;
+ else{
+  mx=`<table class="mx"><tr><th>Student</th>${lessons.length?lessons.map(l=>`<th>${esc(short(l))}</th>`).join(""):"<th>Homework</th>"}</tr>`+
+  st.map(s=>`<tr><td class="st who"><b>${esc(s.name)}</b><div>${esc(s.level)} · ${esc(s.track)}</div><a href="https://villevian.github.io/bp-${esc(s.slug)}/" target="_blank" rel="noopener">сторінка ↗</a></td>`+
+   (lessons.length?lessons.map(l=>{const o=OVER.find(x=>x.slug===s.slug&&x.lesson===l);
+    if(!o)return `<td><span class="chip none">—</span></td>`;
+    const sc=o.score?Object.values(o.score).join(" · "):"";
+    return `<td><span class="chip ${o.submitted?"done":"prog"}" data-s="${esc(s.slug)}" data-ls="${esc(l)}">${o.submitted?"✓ Sent":"In progress"}${o.has_comment?'<span class="c">💬</span>':""}</span><div class="note" style="margin-top:4px">${esc(sc)}<br>${fmtDate(o.updated_at)}</div></td>`}).join(""):`<td><span class="chip none">ще немає відповідей</span></td>`)+`</tr>`).join("")+`</table>`;
+ }
+ app.innerHTML=`<div class="levels">${lv}</div>${mx}<div id="det"></div>
+ <div class="add"><h3>Додати / змінити студента</h3>
+ <form id="af"><input name="name" placeholder="Name (e.g. Kate)" required><input name="slug" placeholder="slug (kate)" required pattern="[a-z0-9-]+">
+ <select name="level">${LEVELS.map(l=>`<option ${l===LEVEL?"selected":""}>${l}</option>`).join("")}</select>
+ <select name="track"><option value="all">all</option><option value="it">it</option><option value="pm">pm</option><option value="design">design</option></select>
+ <button class="btn">Зберегти</button></form><div id="am" class="note"></div>
+ <p class="note">Після додавання з’явиться особистий код. Його вписують у сторінки студента (репо bp-&lt;slug&gt;) — тоді відповіді пишуться саме на нього, без введення імені.</p>
+ <details class="note"><summary>Коди студентів</summary>${STUDENTS.map(s=>`${esc(s.name)} (${esc(s.slug)}): <span class="code">${esc(s.code)}</span>`).join("<br>")||"—"}</details></div>`;
+ app.querySelectorAll(".levels button").forEach(b=>b.onclick=()=>{LEVEL=b.dataset.l;SEL=null;render()});
+ app.querySelectorAll(".chip[data-s]").forEach(c=>c.onclick=()=>openDetail(c.dataset.s,c.dataset.ls));
+ document.getElementById("af").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const am=document.getElementById("am");
+  try{const code=await rpc("admin_add_student",{p_key:KEY,p_slug:f.get("slug"),p_name:f.get("name"),p_level:f.get("level"),p_track:f.get("track")});
+   am.innerHTML=`<span class="ok">✓ Збережено. Код: <span class="code">${esc(code)}</span></span>`;LEVEL=f.get("level");setTimeout(load,800)}
+  catch(err){am.innerHTML=`<span class="err">Помилка: ${esc(err.message)}</span>`}};
+ if(SEL)openDetail(SEL[0],SEL[1]);
+}
+function groupAnswers(a){
+ const g={};
+ Object.entries(a||{}).forEach(([k,v])=>{
+  let ex="Other",item=k;const m=k.match(/^e(\d+)([a-z]?)_?(.*)$/);
+  if(m){ex="Ex "+m[1]+(m[2]?m[2].toUpperCase():"");item=m[3]||""}else if(k==="self"){ex="Self-assessment";item=""}else if(k==="q"){ex="Questions for teacher";item=""}
+  (g[ex]=g[ex]||[]).push([item,Array.isArray(v)?v.join(", "):v]);
+ });
+ return Object.entries(g).sort((x,y)=>{const n=s=>parseInt((s.match(/\d+/)||[999])[0]);return n(x[0])-n(y[0])||x[0].localeCompare(y[0])});
+}
+async function openDetail(slug,lesson){
+ SEL=[slug,lesson];const s=STUDENTS.find(x=>x.slug===slug);const det=document.getElementById("det");det.innerHTML=`<p class="note">Loading…</p>`;
+ let d;try{d=(await rpc("admin_get",{p_key:KEY,p_slug:slug,p_lesson:lesson}))[0]}catch(e){det.innerHTML=`<p class="err">${esc(e.message)}</p>`;return}
+ if(!d){det.innerHTML="";return}
+ const groups=groupAnswers(d.answers);
+ det.innerHTML=`<div class="detail"><h3>${esc(s?s.name:slug)} · ${esc(short(lesson))}</h3>
+ <div class="meta">${d.submitted?"✓ Надіслано вчителю":"Ще в процесі"} · оновлено ${fmtDate(d.updated_at)}</div>
+ <div class="scores">${d.score?Object.entries(d.score).map(([k,v])=>`<span>${esc(k.replace(/^e/,"Ex "))}: <b>${esc(v)}</b></span>`).join(""):""}</div>
+ <div class="ans">${groups.map(([ex,items])=>`<div class="ex"><h4>${esc(ex)}</h4>${items.map(([i,v])=>`<div><i>${esc(i)}</i>${v===""||v==null?'<span class="emptyv">—</span>':esc(v)}</div>`).join("")}</div>`).join("")}</div>
+ <b style="font-weight:600">💬 Коментар для студента</b><p class="note" style="margin:2px 0 6px">Студент побачить його вгорі своєї домашки, а в Contents — позначку 💬.</p>
+ <textarea id="cm">${esc(d.teacher_comment||"")}</textarea>
+ <div style="margin-top:8px;display:flex;gap:8px;align-items:center"><button class="btn" id="sv">Зберегти коментар</button><button class="btn l" onclick="SEL=null;document.getElementById('det').innerHTML=''">Закрити</button><span id="svm" class="note"></span></div></div>`;
+ document.getElementById("sv").onclick=async()=>{const m=document.getElementById("svm");try{await rpc("admin_comment",{p_key:KEY,p_slug:slug,p_lesson:lesson,p_comment:document.getElementById("cm").value});m.innerHTML='<span class="ok">✓ Збережено</span>';const o=OVER.find(x=>x.slug===slug&&x.lesson===lesson);if(o)o.has_comment=!!document.getElementById("cm").value.trim()}catch(e){m.innerHTML='<span class="err">Помилка</span>'}};
+ det.scrollIntoView({behavior:"smooth",block:"start"});
+}
+load();
+</script></body></html>
