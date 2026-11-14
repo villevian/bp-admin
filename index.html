@@ -51,6 +51,22 @@ textarea{font:inherit;width:100%;min-height:90px;padding:8px 10px;border:1px sol
 .note{font-size:13.5px;color:var(--grey);margin-top:8px}
 .ok{color:#2e7d32}.err{color:#c0392b}
 .code{font-family:monospace;background:var(--lg);padding:1px 6px;border-radius:3px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:10px}
+.card{border:1px solid #d5d6d7;border-left:5px solid var(--acc);border-radius:6px;padding:14px 16px;cursor:pointer;background:#fff;transition:box-shadow .15s}
+.card:hover{box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.card b{display:block;font-size:18px;font-weight:600}
+.card .sub{font-size:13px;color:var(--grey);margin-top:2px}
+.card .stat{font-size:13px;margin-top:8px}
+.back{display:inline-block;margin-bottom:12px;color:var(--acc);text-decoration:none;font-weight:500;cursor:pointer}
+.sh{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.sh h2{margin:0;font-weight:500;font-size:26px}
+.info{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:#4d4d4f;margin-bottom:16px}
+.info a{color:var(--acc)}
+table.ls{border-collapse:collapse;width:100%;font-size:14.5px;margin-bottom:16px}
+table.ls th,table.ls td{border-bottom:1px solid #e3e4e5;padding:9px 8px;text-align:left}
+table.ls th{font-weight:600;color:var(--grey);font-size:13px}
+table.ls tr.row{cursor:pointer}table.ls tr.row:hover{background:var(--acc2)}
+table.ls tr.sel{background:var(--acc2)}
 footer{text-align:center;color:var(--grey);font-size:12px;padding:20px}
 </style></head><body>
 <header><div class="lv">BP</div><h1>Business Partner · Admin</h1><div class="r" id="hdr" style="display:none"><button class="btn l" onclick="load()">↻ Refresh</button><button class="btn l" onclick="logout()">Log out</button></div></header>
@@ -87,35 +103,46 @@ async function load(){
  if(!LEVEL){LEVEL=(LEVELS.find(l=>STUDENTS.some(s=>s.level===l)))||"A2+"}
  render();
 }
+function route(){const h=decodeURIComponent(location.hash.slice(1));return h.startsWith("s/")?h.slice(2):null}
+window.addEventListener("hashchange",()=>{SEL=null;render()});
 function render(){
+ const slug=route();
+ if(slug&&STUDENTS.some(s=>s.slug===slug))return studentPage(slug);
  const lv=LEVELS.map(l=>{const n=STUDENTS.filter(s=>s.level===l).length;return `<button class="${l===LEVEL?"on":""}" data-l="${l}">${l}<small>${n?"· "+n:""}</small></button>`}).join("");
  const st=STUDENTS.filter(s=>s.level===LEVEL);
- const lessons=[...new Set(OVER.filter(o=>st.some(s=>s.slug===o.slug)).map(o=>o.lesson))].sort((a,b)=>lessonNo(a).localeCompare(lessonNo(b),undefined,{numeric:true}));
- let mx="";
- if(!st.length)mx=`<p class="empty">На рівні ${LEVEL} ще немає студентів. Додайте нижче.</p>`;
- else{
-  mx=`<table class="mx"><tr><th>Student</th>${lessons.length?lessons.map(l=>`<th>${esc(short(l))}</th>`).join(""):"<th>Homework</th>"}</tr>`+
-  st.map(s=>`<tr><td class="st who"><b>${esc(s.name)}</b><div>${esc(s.level)} · ${esc(s.track)}</div><a href="https://villevian.github.io/bp-${esc(s.slug)}/" target="_blank" rel="noopener">сторінка ↗</a></td>`+
-   (lessons.length?lessons.map(l=>{const o=OVER.find(x=>x.slug===s.slug&&x.lesson===l);
-    if(!o)return `<td><span class="chip none">—</span></td>`;
-    const sc=o.score?Object.values(o.score).join(" · "):"";
-    return `<td><span class="chip ${o.submitted?"done":"prog"}" data-s="${esc(s.slug)}" data-ls="${esc(l)}">${o.submitted?"✓ Sent":"In progress"}${o.has_comment?'<span class="c">💬</span>':""}</span><div class="note" style="margin-top:4px">${esc(sc)}<br>${fmtDate(o.updated_at)}</div></td>`}).join(""):`<td><span class="chip none">ще немає відповідей</span></td>`)+`</tr>`).join("")+`</table>`;
- }
- app.innerHTML=`<div class="levels">${lv}</div>${mx}<div id="det"></div>
+ const cards=st.length?`<div class="cards">${st.map(s=>{const rows=OVER.filter(o=>o.slug===s.slug);const sent=rows.filter(o=>o.submitted).length,prog=rows.length-sent;
+   const last=rows.map(o=>o.updated_at).sort().pop();
+   return `<div class="card" data-s="${esc(s.slug)}"><b>${esc(s.name)}</b><div class="sub">${esc(s.level)} · ${esc(s.track)}</div>
+   <div class="stat">${sent?`<span class="chip done">✓ ${sent} sent</span> `:""}${prog?`<span class="chip prog">${prog} in progress</span>`:""}${!rows.length?'<span class="chip none">no homework yet</span>':""}</div>
+   ${last?`<div class="note" style="margin-top:6px">last activity ${fmtDate(last)}</div>`:""}</div>`}).join("")}</div>`
+  :`<p class="empty">На рівні ${LEVEL} ще немає студентів. Додайте нижче.</p>`;
+ app.innerHTML=`<div class="levels">${lv}</div>${cards}
  <div class="add"><h3>Додати / змінити студента</h3>
  <form id="af"><input name="name" placeholder="Name (e.g. Kate)" required><input name="slug" placeholder="slug (kate)" required pattern="[a-z0-9-]+">
  <select name="level">${LEVELS.map(l=>`<option ${l===LEVEL?"selected":""}>${l}</option>`).join("")}</select>
  <select name="track"><option value="all">all</option><option value="it">it</option><option value="pm">pm</option><option value="design">design</option></select>
  <button class="btn">Зберегти</button></form><div id="am" class="note"></div>
- <p class="note">Після додавання з’явиться особистий код. Його вписують у сторінки студента (репо bp-&lt;slug&gt;) — тоді відповіді пишуться саме на нього, без введення імені.</p>
- <details class="note"><summary>Коди студентів</summary>${STUDENTS.map(s=>`${esc(s.name)} (${esc(s.slug)}): <span class="code">${esc(s.code)}</span>`).join("<br>")||"—"}</details></div>`;
- app.querySelectorAll(".levels button").forEach(b=>b.onclick=()=>{LEVEL=b.dataset.l;SEL=null;render()});
- app.querySelectorAll(".chip[data-s]").forEach(c=>c.onclick=()=>openDetail(c.dataset.s,c.dataset.ls));
+ <p class="note">Після додавання з’явиться особистий код. Його вписують у сторінки студента (репо bp-&lt;slug&gt;) — тоді відповіді пишуться саме на нього, без введення імені.</p></div>`;
+ app.querySelectorAll(".levels button").forEach(b=>b.onclick=()=>{LEVEL=b.dataset.l;render()});
+ app.querySelectorAll(".card[data-s]").forEach(c=>c.onclick=()=>{location.hash="s/"+c.dataset.s});
  document.getElementById("af").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const am=document.getElementById("am");
   try{const code=await rpc("admin_add_student",{p_key:KEY,p_slug:f.get("slug"),p_name:f.get("name"),p_level:f.get("level"),p_track:f.get("track")});
    am.innerHTML=`<span class="ok">✓ Збережено. Код: <span class="code">${esc(code)}</span></span>`;LEVEL=f.get("level");setTimeout(load,800)}
   catch(err){am.innerHTML=`<span class="err">Помилка: ${esc(err.message)}</span>`}};
- if(SEL)openDetail(SEL[0],SEL[1]);
+}
+function studentPage(slug){
+ const s=STUDENTS.find(x=>x.slug===slug);LEVEL=s.level;
+ const rows=OVER.filter(o=>o.slug===slug).sort((a,b)=>lessonNo(a.lesson).localeCompare(lessonNo(b.lesson),undefined,{numeric:true}));
+ app.innerHTML=`<a class="back" onclick="location.hash=''">← Усі студенти (${esc(s.level)})</a>
+ <div class="sh"><h2>${esc(s.name)}</h2><span class="chip done" style="cursor:default">${esc(s.level)}</span><span class="chip none" style="color:#4d4d4f">track: ${esc(s.track)}</span></div>
+ <div class="info"><a href="https://villevian.github.io/bp-${esc(s.slug)}/" target="_blank" rel="noopener">Сторінка студента ↗</a><span>Код: <span class="code">${esc(s.code)}</span></span></div>
+ <h3 style="font-weight:500;margin:6px 0">Домашні завдання</h3>
+ ${rows.length?`<table class="ls"><tr><th>Урок</th><th>Статус</th><th>Бали</th><th>Оновлено</th><th></th></tr>${rows.map(o=>`<tr class="row${SEL&&SEL[1]===o.lesson?" sel":""}" data-ls="${esc(o.lesson)}"><td><b style="font-weight:500">${esc(short(o.lesson))}</b></td>
+  <td><span class="chip ${o.submitted?"done":"prog"}">${o.submitted?"✓ Sent":"In progress"}</span></td><td>${esc(o.score?Object.entries(o.score).map(([k,v])=>k.replace(/^e/,"Ex ")+": "+v).join(" · "):"")}</td>
+  <td class="note">${fmtDate(o.updated_at)}</td><td>${o.has_comment?"💬":""}</td></tr>`).join("")}</table>`:`<p class="empty">Ще немає жодної домашки.</p>`}
+ <div id="det"></div>`;
+ app.querySelectorAll("tr.row").forEach(r=>r.onclick=()=>{app.querySelectorAll("tr.row").forEach(x=>x.classList.remove("sel"));r.classList.add("sel");openDetail(slug,r.dataset.ls)});
+ if(SEL&&SEL[0]===slug)openDetail(slug,SEL[1]);else if(rows.length===1)openDetail(slug,rows[0].lesson);
 }
 function groupAnswers(a){
  const g={};
@@ -139,7 +166,7 @@ async function openDetail(slug,lesson){
  <textarea id="cm">${esc(d.teacher_comment||"")}</textarea>
  <div style="margin-top:8px;display:flex;gap:8px;align-items:center"><button class="btn" id="sv">Зберегти коментар</button><button class="btn l" onclick="SEL=null;document.getElementById('det').innerHTML=''">Закрити</button><span id="svm" class="note"></span></div></div>`;
  document.getElementById("sv").onclick=async()=>{const m=document.getElementById("svm");try{await rpc("admin_comment",{p_key:KEY,p_slug:slug,p_lesson:lesson,p_comment:document.getElementById("cm").value});m.innerHTML='<span class="ok">✓ Збережено</span>';const o=OVER.find(x=>x.slug===slug&&x.lesson===lesson);if(o)o.has_comment=!!document.getElementById("cm").value.trim()}catch(e){m.innerHTML='<span class="err">Помилка</span>'}};
- det.scrollIntoView({behavior:"smooth",block:"start"});
+ 
 }
 load();
 </script></body></html>
