@@ -68,7 +68,7 @@ table.ls th{font-weight:600;color:var(--grey);font-size:13px}
 table.ls tr.row{cursor:pointer}table.ls tr.row:hover{background:var(--acc2)}
 table.ls tr.sel{background:var(--acc2)}
 footer{text-align:center;color:var(--grey);font-size:12px;padding:20px}
-</style></head><body>
+.ctx{margin:10px 0}.cx{border:1px solid #e1e2e3;border-radius:8px;padding:8px 12px;margin:8px 0}.cx h4{margin:2px 0 6px;font-size:14px;color:#2b8185}.ci{padding:5px 0;border-top:1px solid #f1f1f2}.cq{color:#6d6e70;font-size:13.5px}.av{font-weight:500;color:#231f20;white-space:pre-wrap}</style></head><body>
 <header><div class="lv">BP</div><h1>Business Partner · Admin</h1><a href="hub.html" style="margin-left:16px;align-self:center;color:#5b5fc7;font-weight:500;text-decoration:none">🗂 All levels &amp; students</a><div class="r" id="hdr" style="display:none"><button class="btn l" onclick="load()">↻ Refresh</button><button class="btn l" onclick="logout()">Log out</button></div></header>
 <main id="app"></main>
 <footer>Valentyna Hordiienko · Middle Learning Architect</footer>
@@ -153,15 +153,24 @@ function groupAnswers(a){
  });
  return Object.entries(g).sort((x,y)=>{const n=s=>parseInt((s.match(/\d+/)||[999])[0]);return n(x[0])-n(y[0])||x[0].localeCompare(y[0])});
 }
+function renderCtx(a){
+ if(!a||!a._ctx)return "";const C=a._ctx;const keys=Object.keys(a).filter(k=>!k.startsWith("_")&&C[k]).sort((x,y)=>C[x].i-C[y].i);
+ const known=new Set(keys);const extra=Object.keys(a).filter(k=>!k.startsWith("_")&&!known.has(k));
+ const sec=[];keys.forEach(k=>{const s=C[k].s||"";let g=sec.find(x=>x.s===s);if(!g){g={s,items:[]};sec.push(g)}g.items.push([C[k].q,a[k]])});
+ if(extra.length)sec.push({s:"Other",items:extra.map(k=>[k,a[k]])});
+ const val=v=>v===""||v==null?'<span class="emptyv">— не заповнено</span>':'<b class="av">'+esc(Array.isArray(v)?v.join(", "):String(v))+'</b>';
+ return (a._page?'<p class="note"><a href="'+esc(a._page)+'" target="_blank">📄 Відкрити сторінку студента</a></p>':'')+
+  '<div class="ctx">'+sec.map(g=>'<div class="cx"><h4>'+esc(g.s)+'</h4>'+g.items.map(([q,v])=>'<div class="ci"><div class="cq">'+esc(q||"")+'</div>'+val(v)+'</div>').join("")+'</div>').join("")+'</div>'}
 async function openDetail(slug,lesson){
  SEL=[slug,lesson];const s=STUDENTS.find(x=>x.slug===slug);const det=document.getElementById("det");det.innerHTML=`<p class="note">Loading…</p>`;
  let d;try{d=(await rpc("admin_get",{p_key:KEY,p_slug:slug,p_lesson:lesson}))[0]}catch(e){det.innerHTML=`<p class="err">${esc(e.message)}</p>`;return}
  if(!d){det.innerHTML="";return}
- const groups=groupAnswers(d.answers);
+ const groups=groupAnswers(Object.fromEntries(Object.entries(d.answers||{}).filter(([k])=>!k.startsWith("_"))));
+ const ctxHtml=renderCtx(d.answers);
  det.innerHTML=`<div class="detail"><h3>${esc(s?s.name:slug)} · ${esc(short(lesson))}</h3>
  <div class="meta">${d.submitted?"✓ Надіслано вчителю":"Ще в процесі"} · оновлено ${fmtDate(d.updated_at)}</div>
  <div class="scores">${d.score?Object.entries(d.score).map(([k,v])=>`<span>${esc(k.replace(/^e/,"Ex "))}: <b>${esc(v)}</b></span>`).join(""):""}</div>
- <div class="ans">${groups.map(([ex,items])=>`<div class="ex"><h4>${esc(ex)}</h4>${items.map(([i,v])=>`<div><i>${esc(i)}</i>${v===""||v==null?'<span class="emptyv">—</span>':esc(v)}</div>`).join("")}</div>`).join("")}</div>
+ ${ctxHtml?ctxHtml:`<div class="ans">${groups.map(([ex,items])=>`<div class="ex"><h4>${esc(ex)}</h4>${items.map(([i,v])=>`<div><i>${esc(i)}</i>${v===""||v==null?'<span class="emptyv">—</span>':esc(v)}</div>`).join("")}</div>`).join("")}</div>`}
  <b style="font-weight:600">💬 Коментар для студента</b><p class="note" style="margin:2px 0 6px">Студент побачить його вгорі своєї домашки, а в Contents — позначку 💬.</p>
  <textarea id="cm">${esc(d.teacher_comment||"")}</textarea>
  <div style="margin-top:8px;display:flex;gap:8px;align-items:center"><button class="btn" id="sv">Зберегти коментар</button><button class="btn l" onclick="SEL=null;document.getElementById('det').innerHTML=''">Закрити</button><span id="svm" class="note"></span></div></div>`;
