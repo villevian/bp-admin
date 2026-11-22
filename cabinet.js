@@ -73,6 +73,6 @@
     }
     const note = c.note ? `<div class="note">💬 <b>From your teacher:</b> ${esc(c.note)}</div>` : "";
     if (!cards.length && !note) { box.remove(); return; }
-    box.innerHTML = `<h2>Hi, ${esc((c.name || "").split(" ")[0])}! 👋<span>${esc(c.level || "")}</span></h2><div class="grid">${cards.join("")}${note}</div>`;
+    box.innerHTML = `<h2>Hi, ${esc((c.name || "").split(" ")[0])}! 👋</h2><div class="grid">${cards.join("")}${note}</div>`;
   }).catch(() => { box.remove(); });
 })();
