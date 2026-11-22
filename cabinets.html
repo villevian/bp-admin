@@ -49,7 +49,7 @@ let KEY="";try{KEY=localStorage.getItem("bp_admin_key")||""}catch(e){}
 let ALL=[],OVER=[],SEL=null;
 const COLORS=["#ff6b3d","#3b5bdb","#23824a","#8e5bd8","#e08a00","#1f9eb8","#c4127a","#5c6b8a"];
 const col=s=>COLORS[[...s].reduce((a,c)=>a+c.charCodeAt(0),0)%COLORS.length];
-const SITE={anna:"ge-anna",yana:"ge-yana",maria:"ge-maria"};
+const SITE={anna:"ge-anna",yana:"ge-yana","maria-kindieva":"ge-maria",maria:"outcomes-elementary-course/a1-unit8"};
 const siteOf=c=>c.site_url||("https://villevian.github.io/"+(SITE[c.slug]||("bp-"+c.slug))+"/");
 const fmtDT=s=>{if(!s)return"—";const d=new Date(s);return d.toLocaleDateString("uk-UA",{weekday:"short",day:"numeric",month:"short"})+", "+d.toLocaleTimeString("uk-UA",{hour:"2-digit",minute:"2-digit"})};
 const toLocalInput=s=>{if(!s)return"";const d=new Date(s);const p=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+"T"+p(d.getHours())+":"+p(d.getMinutes())};
