@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Кабінети студентів — Admin</title><meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--or:#ff6b3d;--or2:#fff1ea;--ink:#1f2a44;--mut:#8a92a6;--line:#e6e9f0;--bg:#f5f7fb;--ok:#23824a;--warn:#e08a00;--bad:#c0392b;--blue:#3b5bdb}
+*{box-sizing:border-box}body{margin:0;font-family:"Fira Sans",system-ui,sans-serif;color:var(--ink);background:var(--bg);font-size:15px}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+aside{background:#fff;border-right:1px solid var(--line);padding:18px 12px;position:sticky;top:0;height:100vh;overflow:auto}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;margin:0 6px 18px}.logo b{background:var(--or);color:#fff;border-radius:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center}
+aside a.nav{display:block;color:var(--mut);text-decoration:none;font-size:14px;padding:6px 8px;border-radius:8px}aside a.nav:hover{background:var(--bg)}
+aside h4{font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--mut);margin:16px 8px 6px}
+.st{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:10px;cursor:pointer}.st:hover{background:var(--bg)}.st.on{background:var(--or2)}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;color:#fff;flex:none}
+.st .nm{flex:1;min-width:0}.st .nm b{display:block;font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.st .nm span{font-size:12px;color:var(--mut)}
+.bd{font-size:12px;font-weight:700;border-radius:8px;padding:2px 7px;min-width:26px;text-align:center}
+.bd.ok{background:#e7f6ec;color:var(--ok)}.bd.wa{background:#fff4e0;color:var(--warn)}.bd.ba{background:#fdecec;color:var(--bad)}.bd.co{background:#eef3ff;color:var(--blue)}
+main{padding:22px 28px 40px;max-width:1200px}
+h1{margin:0 0 16px;font-size:24px;font-weight:600}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:0 2px 10px rgba(31,42,68,.04)}
+.card h3{margin:0 0 8px;font-size:12.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);font-weight:600}
+.li{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid #f1f2f6;font-size:14px;cursor:pointer}.li:first-of-type{border-top:0}.li span{color:var(--mut)}
+.empty{color:var(--mut);font-size:14px}
+.det{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}
+.det .card.full{grid-column:1/-1}
+.hd{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.hd .av{width:46px;height:46px;font-size:18px}.hd h2{margin:0;font-size:22px;font-weight:600}.hd .lv{font-size:13px;font-weight:600;background:#eef3ff;color:var(--blue);border-radius:8px;padding:3px 9px}
+.hd .sp{flex:1}.links a{color:var(--blue);font-size:14px;text-decoration:none;margin-left:12px}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}.seg button{border:0;background:#fff;padding:6px 12px;font:500 14px "Fira Sans";cursor:pointer;color:var(--mut)}.seg button.on{background:var(--or);color:#fff}
+.bal{display:flex;align-items:center;gap:18px}.bal .num{font-size:52px;font-weight:700;line-height:1}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.btn{background:var(--or);color:#fff;border:0;border-radius:10px;padding:8px 14px;font:600 14px "Fira Sans";cursor:pointer}.btn.l{background:#fff;color:var(--ink);border:1.5px solid var(--line)}.btn.s{padding:5px 10px;font-size:13px}
+label.f{display:block;font-size:12.5px;color:var(--mut);margin:10px 0 3px;font-weight:500}
+input.i,textarea.i,select.i{width:100%;font:inherit;font-size:15px;border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;background:#fff}textarea.i{min-height:64px}
+input.i:focus,textarea.i:focus{outline:0;border-color:var(--or)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.mk{display:flex;gap:6px}.mk input{flex:1}
+.saved{font-size:13px;color:var(--ok);margin-left:8px}.err{color:var(--bad)}
+.log div{display:flex;justify-content:space-between;font-size:13.5px;padding:4px 0;border-top:1px solid #f1f2f6}.log div:first-child{border-top:0}
+.pill{font-size:12px;font-weight:600;border-radius:8px;padding:2px 8px}
+.login{max-width:380px;margin:12vh auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;text-align:center}
+@media(max-width:900px){.app{grid-template-columns:1fr}aside{position:static;height:auto}.row3,.det{grid-template-columns:1fr}}
+</style></head><body><div id="root"></div>
+<script>
+const SB="https://zuegojpfhgigsvyrnymt.supabase.co",SK="sb_publishable__Xn8xRhne9Hp2ckaXu6xCQ_MOe52bng";
+const rpc=(f,b)=>fetch(SB+"/rest/v1/rpc/"+f,{method:"POST",headers:{apikey:SK,"Content-Type":"application/json"},body:JSON.stringify(b)}).then(async r=>{const t=await r.text();if(!r.ok)throw new Error(t);return t?JSON.parse(t):null});
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const $=id=>document.getElementById(id);
+let KEY="";try{KEY=localStorage.getItem("bp_admin_key")||""}catch(e){}
+let ALL=[],OVER=[],SEL=null;
+const COLORS=["#ff6b3d","#3b5bdb","#23824a","#8e5bd8","#e08a00","#1f9eb8","#c4127a","#5c6b8a"];
+const col=s=>COLORS[[...s].reduce((a,c)=>a+c.charCodeAt(0),0)%COLORS.length];
+const SITE={anna:"ge-anna",yana:"ge-yana",maria:"ge-maria"};
+const siteOf=c=>c.site_url||("https://villevian.github.io/"+(SITE[c.slug]||("bp-"+c.slug))+"/");
+const fmtDT=s=>{if(!s)return"—";const d=new Date(s);return d.toLocaleDateString("uk-UA",{weekday:"short",day:"numeric",month:"short"})+", "+d.toLocaleTimeString("uk-UA",{hour:"2-digit",minute:"2-digit"})};
+const toLocalInput=s=>{if(!s)return"";const d=new Date(s);const p=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+"T"+p(d.getHours())+":"+p(d.getMinutes())};
+function badge(c){if(c.payment==="company")return'<span class="bd co">комп.</span>';if(c.lessons_left==null)return'<span class="bd" style="color:#8a92a6">—</span>';const n=c.lessons_left;return'<span class="bd '+(n<=0?"ba":n<=2?"wa":"ok")+'">'+n+'</span>'}
+
+function login(msg){$("root").innerHTML=`<div class="login"><h2 style="margin:0 0 6px;font-weight:600">Кабінети студентів</h2><p class="empty">Ключ адміністратора (той самий, що в адмінці)</p>
+ <input class="i" id="k" type="password" placeholder="Ключ"><div style="margin-top:12px"><button class="btn" id="go">Увійти</button></div>${msg?'<p class="err">'+esc(msg)+"</p>":""}</div>`;
+ const go=()=>{KEY=$("k").value.trim();load()};$("go").onclick=go;$("k").onkeydown=e=>{if(e.key==="Enter")go()}}
+async function load(){if(!KEY)return login();
+ try{[ALL,OVER]=await Promise.all([rpc("admin_cabinets",{p_key:KEY}),rpc("admin_overview",{p_key:KEY})]);try{localStorage.setItem("bp_admin_key",KEY)}catch(e){}}
+ catch(e){const m=String(e.message||e);return login(/admin_cabinets/.test(m)&&/not find|does not exist|Could not/.test(m)?"Спершу запусти SQL з файлу sql/cabinet.sql у Supabase.":/not allowed/.test(m)?"Невірний ключ.":m)}
+ render()}
+function render(){
+ const side=ALL.map(c=>`<div class="st${SEL===c.slug?" on":""}" data-s="${esc(c.slug)}"><div class="av" style="background:${col(c.slug)}">${esc((c.name||"?")[0])}</div><div class="nm"><b>${esc(c.name)}</b><span>${esc(c.level)}${c.next_lesson?" · "+esc(new Date(c.next_lesson).toLocaleDateString("uk-UA",{weekday:"short",day:"numeric"})):""}</span></div>${badge(c)}</div>`).join("");
+ $("root").innerHTML=`<div class="app"><aside><div class="logo"><b>V</b>Кабінети</div><a class="nav" href="index.html">📥 Відповіді студентів</a><a class="nav" href="hub.html">🗂 Рівні й сайти</a><a class="nav" href="#" id="lo">↩ Вийти</a>
+ <h4>Студенти</h4>${side}</aside><main id="main"></main></div>`;
+ document.querySelectorAll(".st").forEach(el=>el.onclick=()=>{SEL=el.dataset.s;render()});$("lo").onclick=e=>{e.preventDefault();KEY="";try{localStorage.removeItem("bp_admin_key")}catch(x){};login()};
+ SEL?detail(ALL.find(c=>c.slug===SEL)):overview()}
+
+function overview(){
+ const now=new Date(),wk=new Date(now.getTime()+7*864e5);
+ const up=ALL.filter(c=>c.next_lesson&&new Date(c.next_lesson)>new Date(now.getTime()-3*36e5)&&new Date(c.next_lesson)<wk).sort((a,b)=>new Date(a.next_lesson)-new Date(b.next_lesson));
+ const past=ALL.filter(c=>c.next_lesson&&new Date(c.next_lesson)<new Date(now.getTime()-3*36e5));
+ const low=ALL.filter(c=>c.payment!=="company"&&c.lessons_left!=null&&c.lessons_left<=2).sort((a,b)=>a.lessons_left-b.lessons_left);
+ const hw=ALL.filter(c=>c.homework||c.homework_url).map(c=>({c,s:hwStatus(c)})).filter(x=>x.s.k!=="ok");
+ const L=(arr,f)=>arr.length?arr.map(f).join(""):'<p class="empty">Немає</p>';
+ $("main").innerHTML=`<h1>Огляд</h1><div class="row3">
+  <div class="card"><h3>📅 Уроки цього тижня</h3>${L(up,c=>`<div class="li" data-s="${c.slug}"><b>${esc(c.name)}</b><span>${fmtDT(c.next_lesson)}</span></div>`)}
+   ${past.length?`<h3 style="margin-top:12px;color:#c0392b">⚠ Дата наступного уроку вже минула</h3>`+L(past,c=>`<div class="li" data-s="${c.slug}"><b>${esc(c.name)}</b><span>${fmtDT(c.next_lesson)}</span></div>`):""}</div>
+  <div class="card"><h3>🎟 Закінчуються уроки</h3>${L(low,c=>`<div class="li" data-s="${c.slug}"><b>${esc(c.name)}</b>${badge(c)}</div>`)}</div>
+  <div class="card"><h3>📝 Домашка не здана</h3>${L(hw,x=>`<div class="li" data-s="${x.c.slug}"><b>${esc(x.c.name)}</b><span class="pill" style="background:${x.s.bg};color:${x.s.fg}">${x.s.t}</span></div>`)}</div></div>
+  <div class="card"><h3>Усі студенти</h3><table style="width:100%;border-collapse:collapse;font-size:14px">
+  <tr style="color:#8a92a6;text-align:left"><th style="padding:6px 4px">Студент</th><th>Зараз</th><th>Домашка</th><th>Наступний урок</th><th>Уроків</th></tr>
+  ${ALL.map(c=>{const s=hwStatus(c);return`<tr class="li" data-s="${c.slug}" style="display:table-row"><td style="padding:7px 4px"><b>${esc(c.name)}</b> <span style="color:#8a92a6">${esc(c.level)}</span></td><td>${esc(c.current_lesson||"—")}</td>
+   <td>${c.homework||c.homework_url?`<span class="pill" style="background:${s.bg};color:${s.fg}">${s.t}</span>`:"—"}</td><td>${fmtDT(c.next_lesson)}</td><td>${badge(c)}</td></tr>`}).join("")}</table></div>`;
+ document.querySelectorAll("[data-s]").forEach(el=>{if(el.closest("main"))el.onclick=()=>{SEL=el.dataset.s;render()}})}
+
+function lessonNoFromUrl(u){const m=String(u||"").match(/lessons\/([^/]+)\//);return m?m[1].replace("-","."):null}
+function hwStatus(c){const no=lessonNoFromUrl(c.homework_url)||((String(c.homework||c.current_lesson||"").match(/\b(\d+\.\d+|\d+[A-C])\b/)||[])[1]);
+ const r=OVER.filter(o=>o.slug===c.slug&&no&&String(o.lesson).includes(no)&&/homework|· hw/i.test(o.lesson));
+ if(r.some(o=>o.submitted))return{k:"ok",t:"✓ здано",bg:"#e7f6ec",fg:"#23824a"};if(r.length)return{k:"wip",t:"в процесі",bg:"#fff4e0",fg:"#b26b00"};return{k:"no",t:"не почала",bg:"#fdecec",fg:"#c0392b"}}
+
+async function detail(c){
+ const site=siteOf(c);const pay=c.payment||"private";const n=c.lessons_left;
+ const ncol=n==null?"#8a92a6":n<=0?"#c0392b":n<=2?"#e08a00":"#23824a";
+ $("main").innerHTML=`<div class="card full" style="margin-bottom:14px"><div class="hd"><div class="av" style="background:${col(c.slug)}">${esc(c.name[0])}</div><div><h2>${esc(c.name)}</h2><span class="lv">${esc(c.level)}</span></div><div class="sp"></div>
+  <div class="links"><a href="${esc(site)}" target="_blank">🌐 Сайт студента</a><a href="index.html">📥 Відповіді</a><a href="#" id="back">← Огляд</a></div></div></div>
+ <div class="det">
+  <div class="card"><h3>🎟 Оплата і уроки</h3><div class="seg" id="pay"><button data-v="private" class="${pay==="private"?"on":""}">Приватна</button><button data-v="company" class="${pay==="company"?"on":""}">Компанія</button></div>
+   <div id="balbox" style="${pay==="company"?"display:none":""}"><div class="bal" style="margin-top:12px"><div class="num" style="color:${ncol}">${n==null?"—":n}</div><div class="empty">уроків лишилось${c.lesson_price?" · ціна "+esc(c.lesson_price):""}<br>${c.last_done?"останній проведений: "+fmtDT(c.last_done):""}</div></div>
+   <div class="btns"><button class="btn" id="done">✓ Урок проведено (−1)</button><button class="btn l" id="miss">Пропуск без списання</button></div>
+   <div class="btns"><input class="i" id="paidN" type="number" min="1" value="8" style="width:80px"><button class="btn l" id="paid">+ Оплата (уроків)</button><input class="i" id="adjN" type="number" value="1" style="width:70px"><button class="btn l" id="adj">± Коригування</button></div>
+   <label class="f">Ціна уроку (для себе)</label><input class="i" id="lesson_price" value="${esc(c.lesson_price||"")}" placeholder="€25"></div>
+   ${pay==="company"?'<p class="empty" style="margin-top:12px">Оплачує компанія — студент не бачить лічильник уроків.</p>':""}
+   <h3 style="margin-top:16px">Журнал</h3><div class="log" id="log"><p class="empty">Завантаження…</p></div></div>
+  <div class="card"><h3>📅 Наступний урок</h3><label class="f">Дата й час</label><input class="i" type="datetime-local" id="next_lesson" value="${toLocalInput(c.next_lesson)}">
+   <div class="btns"><button class="btn l s" data-add="2">+2 дні</button><button class="btn l s" data-add="3">+3 дні</button><button class="btn l s" data-add="4">+4 дні</button><button class="btn l s" data-add="7">+1 тиждень</button></div>
+   <label class="f">Розклад (студент бачить)</label><input class="i" id="schedule" value="${esc(c.schedule||"")}" placeholder="Wed, Fri 18:00">
+   <label class="f">Посилання на дзвінок</label><input class="i" id="meet_url" value="${esc(c.meet_url||"")}" placeholder="https://meet.google.com/…"></div>
+  <div class="card"><h3>📘 Що зараз проходимо</h3><label class="f">Урок (студент бачить)</label><input class="i" id="current_lesson" value="${esc(c.current_lesson||"")}" placeholder="1.2 Events management">
+   <label class="f">Посилання на урок</label><div class="mk"><input class="i" id="current_url" value="${esc(c.current_url||"")}" placeholder="${esc(site)}lessons/1-2/all/lesson.html"><button class="btn l s" id="mkCur" title="Зробити посилання з номера уроку">🔗 з номера</button></div>
+   <label class="f">Адреса сайту студента</label><input class="i" id="site_url" value="${esc(c.site_url||"")}" placeholder="${esc(site)}"></div>
+  <div class="card"><h3>📝 Домашка</h3><label class="f">Що зробити (студент бачить)</label><textarea class="i" id="homework" placeholder="1.2 Homework: exercises 1–5 + write the follow-up email">${esc(c.homework||"")}</textarea>
+   <div class="two"><div><label class="f">Здати до</label><input class="i" type="date" id="homework_due" value="${esc(c.homework_due||"")}"></div>
+   <div><label class="f">Сторінка</label><select class="i" id="hwPage"><option value="hw">Homework</option><option value="extra">Extra</option><option value="speak">Speaking</option><option value="flip">Before class</option><option value="lesson">Lesson</option></select></div></div>
+   <label class="f">Посилання на домашку</label><div class="mk"><input class="i" id="homework_url" value="${esc(c.homework_url||"")}"><button class="btn l s" id="mkHw">🔗 з номера</button></div>
+   <p style="margin:8px 0 0">${c.homework||c.homework_url?(s=>`<span class="pill" style="background:${s.bg};color:${s.fg}">${s.t}</span>`)(hwStatus(c)):""}</p></div>
+  <div class="card full"><div class="two"><div><h3>💬 Повідомлення студенту</h3><textarea class="i" id="note" placeholder="Видно вгорі кабінету студента">${esc(c.note||"")}</textarea></div>
+   <div><h3>🔒 Нотатка для себе</h3><textarea class="i" id="private_note" placeholder="Студент не бачить">${esc(c.private_note||"")}</textarea></div></div>
+   <div class="btns"><button class="btn" id="save">Зберегти</button><span id="sv" class="saved"></span></div></div>
+ </div>`;
+ $("back").onclick=e=>{e.preventDefault();SEL=null;render()};
+ const F=["site_url","current_lesson","current_url","homework","homework_url","homework_due","schedule","meet_url","note","private_note","lesson_price"];
+ let payment=pay;
+ document.querySelectorAll("#pay button").forEach(b=>b.onclick=async()=>{payment=b.dataset.v;await save({payment});});
+ const num=()=>{const m=($("current_lesson").value||"").match(/\b(\d+\.\d+|\d+[A-C]|W\d+)\b/);return m?m[1]:null};
+ const base=()=>($("site_url").value.trim()||site).replace(/\/?$/,"/");
+ $("mkCur").onclick=()=>{const k=num();if(!k)return alert("Напиши номер уроку в полі «Урок», напр. 1.2");$("current_url").value=base()+"lessons/"+k.replace(".","-").toLowerCase()+"/all/lesson.html"};
+ $("mkHw").onclick=()=>{const k=lessonNoFromUrl($("current_url").value)||num();if(!k)return alert("Спершу вкажи урок");$("homework_url").value=base()+"lessons/"+k.replace(".","-").toLowerCase()+"/all/"+$("hwPage").value+".html"};
+ document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{const v=$("next_lesson").value;const d=v?new Date(v):new Date();d.setDate(d.getDate()+(+b.dataset.add));$("next_lesson").value=toLocalInput(d.toISOString())});
+ async function save(extra){const p={payment};F.forEach(k=>p[k]=$(k).value);const v=$("next_lesson").value;p.next_lesson=v?new Date(v).toISOString():"";Object.assign(p,extra||{});
+  $("sv").textContent="Зберігаю…";try{await rpc("admin_cabinet_save",{p_key:KEY,p_slug:c.slug,p});await reload(c.slug);$("sv")&&($("sv").textContent="✓ Збережено "+new Date().toLocaleTimeString("uk-UA",{hour:"2-digit",minute:"2-digit"}))}catch(e){$("sv").innerHTML='<span class="err">'+esc(e.message)+"</span>"}}
+ $("save").onclick=()=>save();
+ async function act(kind,delta,note){try{await save();await rpc("admin_lessons",{p_key:KEY,p_slug:c.slug,p_kind:kind,p_delta:delta,p_note:note||""});await reload(c.slug)}catch(e){alert(e.message)}}
+ $("done")&&($("done").onclick=()=>act("done",-1,c.current_lesson||""));
+ $("miss")&&($("miss").onclick=()=>{const r=prompt("Причина пропуску (не списується):","");if(r!==null)act("missed",0,r)});
+ $("paid")&&($("paid").onclick=()=>{const k=parseInt($("paidN").value,10);if(k>0)act("paid",k,"оплата "+k+" уроків")});
+ $("adj")&&($("adj").onclick=()=>{const k=parseInt($("adjN").value,10);if(k)act("adjust",k,"коригування")});
+ try{const L=await rpc("admin_log",{p_key:KEY,p_slug:c.slug});const nm={done:"✓ урок",paid:"💶 оплата",adjust:"± коригування",missed:"✗ пропуск"};
+  $("log").innerHTML=L&&L.length?L.map(l=>`<div><span>${nm[l.kind]||l.kind}${l.note?" · "+esc(l.note):""}</span><span>${l.delta>0?"+":""}${l.delta||""} · ${fmtDT(l.at)}</span></div>`).join(""):'<p class="empty">Ще немає записів</p>'}catch(e){$("log").innerHTML='<p class="err">'+esc(e.message)+"</p>"}}
+async function reload(slug){[ALL,OVER]=await Promise.all([rpc("admin_cabinets",{p_key:KEY}),rpc("admin_overview",{p_key:KEY})]);SEL=slug;render()}
+load();
+</script></body></html>
