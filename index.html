@@ -68,8 +68,8 @@ table.ls th{font-weight:600;color:var(--grey);font-size:13px}
 table.ls tr.row{cursor:pointer}table.ls tr.row:hover{background:var(--acc2)}
 table.ls tr.sel{background:var(--acc2)}
 footer{text-align:center;color:var(--grey);font-size:12px;padding:20px}
-.ctx{margin:10px 0}.cx{border:1px solid #e1e2e3;border-radius:8px;padding:8px 12px;margin:8px 0}.cx h4{margin:2px 0 6px;font-size:14px;color:#2b8185}.ci{padding:5px 0;border-top:1px solid #f1f1f2}.cq{color:#6d6e70;font-size:13.5px}.av{font-weight:500;color:#231f20;white-space:pre-wrap}</style></head><body>
-<header><div class="lv">BP</div><h1>Business Partner · Admin</h1><a href="hub.html" style="margin-left:16px;align-self:center;color:#5b5fc7;font-weight:500;text-decoration:none">🗂 All levels &amp; students</a><a href="cabinets.html" style="margin-left:16px;align-self:center;color:#ff6b3d;font-weight:600;text-decoration:none">🎟 Кабінети студентів</a><div class="r" id="hdr" style="display:none"><button class="btn l" onclick="load()">↻ Refresh</button><button class="btn l" onclick="logout()">Log out</button></div></header>
+.ctx{margin:10px 0}.cx{border:1px solid #e1e2e3;border-radius:8px;padding:8px 12px;margin:8px 0}.cx h4{margin:2px 0 6px;font-size:14px;color:#2b8185}.ci{padding:5px 0;border-top:1px solid #f1f1f2}.cq{color:#6d6e70;font-size:13.5px}.av{font-weight:500;color:#231f20;white-space:pre-wrap}.cx .ins2{color:#6d6e70;font-size:13px;margin:-2px 0 6px}.mk{display:inline-block;margin-left:8px;font-size:13px}.mk.y{color:#1e8449}.mk.n{color:#c0392b}.right{color:#1e8449;font-size:13px;margin-left:6px}.ci.bad{background:#fdf1f0;border-radius:6px;padding-left:6px}</style></head><body>
+<header><div class="lv">BP</div><h1>Business Partner · Admin</h1><a href="hub.html" style="margin-left:16px;align-self:center;color:#5b5fc7;font-weight:500;text-decoration:none">🗂 All levels &amp; students</a><a href="students.html" style="margin-left:16px;align-self:center;color:#ff6b3d;font-weight:600;text-decoration:none">👩‍🏫 Мої студенти</a><a href="cabinets.html" style="margin-left:16px;align-self:center;color:#ff6b3d;font-weight:600;text-decoration:none">🎟 Кабінети студентів</a><div class="r" id="hdr" style="display:none"><button class="btn l" onclick="load()">↻ Refresh</button><button class="btn l" onclick="logout()">Log out</button></div></header>
 <main id="app"></main>
 <footer>Valentyna Hordiienko · Middle Learning Architect</footer>
 <script>
@@ -153,20 +153,61 @@ function groupAnswers(a){
  });
  return Object.entries(g).sort((x,y)=>{const n=s=>parseInt((s.match(/\d+/)||[999])[0]);return n(x[0])-n(y[0])||x[0].localeCompare(y[0])});
 }
-function renderCtx(a){
- if(!a||!a._ctx)return "";const C=a._ctx;const keys=Object.keys(a).filter(k=>!k.startsWith("_")&&C[k]).sort((x,y)=>C[x].i-C[y].i);
- const known=new Set(keys);const extra=Object.keys(a).filter(k=>!k.startsWith("_")&&!known.has(k));
- const sec=[];keys.forEach(k=>{const s=C[k].s||"";let g=sec.find(x=>x.s===s);if(!g){g={s,items:[]};sec.push(g)}g.items.push([C[k].q,a[k]])});
- if(extra.length)sec.push({s:"Other",items:extra.map(k=>[k,a[k]])});
- const val=v=>v===""||v==null?'<span class="emptyv">— не заповнено</span>':'<b class="av">'+esc(Array.isArray(v)?v.join(", "):String(v))+'</b>';
- return (a._page?'<p class="note"><a href="'+esc(a._page)+'" target="_blank">📄 Відкрити сторінку студента</a></p>':'')+
-  '<div class="ctx">'+sec.map(g=>'<div class="cx"><h4>'+esc(g.s)+'</h4>'+g.items.map(([q,v])=>'<div class="ci"><div class="cq">'+esc(q||"")+'</div>'+val(v)+'</div>').join("")+'</div>').join("")+'</div>'}
+const PAGE_CACHE={};
+function pageCandidates(slug,lesson,track){
+ const m=lesson.match(/(\d+)\.(\d+)/);if(!m)return[];const n=m[1]+"-"+m[2];
+ const trs=[...new Set([track,"all",track+"-classic","all-classic"].filter(Boolean))];
+ const fs=/extra/i.test(lesson)?["extra.html"]:/lesson/i.test(lesson)&&!/homework/i.test(lesson)?["lesson.html"]:["hw.html","hw-standard.html","hw-easy.html","extra.html"];
+ const out=[];trs.forEach(t=>fs.forEach(f=>out.push(`https://villevian.github.io/bp-${slug}/lessons/${n}/${t}/${f}`)));return out}
+async function pageFor(slug,lesson,track){
+ const ck=slug+"|"+lesson;if(PAGE_CACHE[ck]!==undefined)return PAGE_CACHE[ck];
+ let found=null;
+ for(const u of pageCandidates(slug,lesson,track)){
+  try{const r=await fetch(u,{cache:"no-cache"});if(!r.ok)continue;const t=await r.text();
+   const L=(t.match(/LESSON\s*=\s*"([^"]+)"/)||[])[1];if(L===lesson){found={url:u,html:t};break}}catch(e){}
+ }
+ return PAGE_CACHE[ck]=found}
+function ctxFromPage(html){
+ const doc=new DOMParser().parseFromString(html,"text/html");const C={};let i=0;
+ let ans=null;const km=html.match(/const KEY\s*=\s*(\{[\s\S]*?\});/);if(km){try{ans=JSON.parse(km[1])}catch(e){}}
+ const clean=t=>(t||"").replace(/\s+/g," ").trim();
+ const secTitle=sec=>{if(!sec)return{t:"",ins:""};const c=sec.cloneNode(true);
+  const h=c.querySelector("h2");let t="";if(h){const num=h.querySelector("span");t=(num?clean(num.textContent)+". ":"")+clean([...h.childNodes].filter(x=>x!==num).map(x=>x.textContent).join(" "))}
+  const p=c.querySelector(".ins");let ins="";if(p){const x=p.querySelector("b.x");if(x&&!t)t="Ex "+clean(x.textContent);if(x)x.remove();const ua=p.querySelector(".ua");const uat=ua?clean(ua.textContent):"";if(ua)ua.remove();ins=clean(p.textContent)||uat}
+  const b=c.querySelector(".bsec");if(b&&t&&!h)t+=" · "+clean(b.textContent);return{t:t||"Task",ins}};
+ const qText=el=>{
+  const box=el.closest(".row,.tf");if(!box)return"";
+  const sq=box.querySelector(".q");if(sq&&el.type==="radio")return clean(sq.textContent);
+  const c=box.cloneNode(true);c.querySelectorAll(".fb,.uah,script").forEach(x=>x.remove());
+  c.querySelectorAll("select,input:not([type=radio]),textarea").forEach(x=>x.replaceWith(" ___ "));
+  const labs=[...c.querySelectorAll("label")];if(labs.length){const opts=labs.map(l=>clean(l.textContent));labs.forEach(l=>l.remove());return clean(c.textContent+" "+opts.join("  /  "))}
+  return clean(c.textContent)};
+ doc.querySelectorAll("[data-k]").forEach(el=>{const k=el.dataset.k;if(!k||k.includes("$")||C[k])return;
+  const sec=el.closest("section");const st=secTitle(sec);
+  let q=qText(el);if(k==="q"){C[k]={s:"Questions for teacher",q:"",i:9000};return}
+  C[k]={s:st.t,ins:st.ins,q,i:i++}});
+ return{C,ans}}
+function renderCtx(a,C,page,ans){
+ if(!a)return "";C=C||a._ctx;if(!C)return "";page=page||a._page;
+ const keys=Object.keys(a).filter(k=>!k.startsWith("_")&&C[k]).sort((x,y)=>C[x].i-C[y].i);
+ const known=new Set(keys);const extra=Object.keys(a).filter(k=>!k.startsWith("_")&&!known.has(k)&&k!=="self");
+ const sec=[];keys.forEach(k=>{const s=C[k].s||"";let g=sec.find(x=>x.s===s);if(!g){g={s,ins:C[k].ins||"",items:[]};sec.push(g)}g.items.push([C[k].q,a[k],k])});
+ if(a.self!=null)sec.push({s:"Self-assessment",items:[["0 = need more practice · 5 = know this well",a.self+" / 5","self"]]});
+ if(extra.length)sec.push({s:"Other",items:extra.map(k=>[k,a[k],k])});
+ const norm=t=>String(t||"").toLowerCase().replace(/[’`]/g,"'").replace(/\s+/g," ").replace(/[.!?]+$/,"").trim();
+ const item=([q,v,k])=>{const empty=v===""||v==null;const key=ans&&ans[k];let mk="",right="",bad=false;
+  if(key&&!empty){const ok=key.some(x=>norm(x)===norm(v));mk=ok?'<span class="mk y">✓</span>':'<span class="mk n">✗</span>';if(!ok){bad=true;right='<span class="right">→ '+esc(key.join(" / "))+'</span>'}}
+  else if(key&&empty){bad=true;right='<span class="right">→ '+esc(key.join(" / "))+'</span>'}
+  return '<div class="ci'+(bad?" bad":"")+'">'+(q?'<div class="cq">'+esc(q)+'</div>':'')+(empty?'<span class="emptyv">— не заповнено</span>':'<b class="av">'+esc(Array.isArray(v)?v.join(", "):String(v))+'</b>')+mk+right+'</div>'};
+ return (page?'<p class="note"><a href="'+esc(page)+'" target="_blank">📄 Відкрити сторінку студента</a></p>':'')+
+  '<div class="ctx">'+sec.map(g=>'<div class="cx"><h4>'+esc(g.s)+'</h4>'+(g.ins?'<div class="ins2">'+esc(g.ins)+'</div>':'')+g.items.map(item).join("")+'</div>').join("")+'</div>'}
 async function openDetail(slug,lesson){
  SEL=[slug,lesson];const s=STUDENTS.find(x=>x.slug===slug);const det=document.getElementById("det");det.innerHTML=`<p class="note">Loading…</p>`;
  let d;try{d=(await rpc("admin_get",{p_key:KEY,p_slug:slug,p_lesson:lesson}))[0]}catch(e){det.innerHTML=`<p class="err">${esc(e.message)}</p>`;return}
  if(!d){det.innerHTML="";return}
  const groups=groupAnswers(Object.fromEntries(Object.entries(d.answers||{}).filter(([k])=>!k.startsWith("_"))));
- const ctxHtml=renderCtx(d.answers);
+ let ctxHtml=renderCtx(d.answers);
+ if(!ctxHtml&&d.answers){const pg=await pageFor(slug,lesson,s&&s.track);if(pg){const r=ctxFromPage(pg.html);ctxHtml=renderCtx(d.answers,r.C,pg.url,r.ans)}}
  det.innerHTML=`<div class="detail"><h3>${esc(s?s.name:slug)} · ${esc(short(lesson))}</h3>
  <div class="meta">${d.submitted?"✓ Надіслано вчителю":"Ще в процесі"} · оновлено ${fmtDate(d.updated_at)}</div>
  <div class="scores">${d.score?Object.entries(d.score).map(([k,v])=>`<span>${esc(k.replace(/^e/,"Ex "))}: <b>${esc(v)}</b></span>`).join(""):""}</div>
