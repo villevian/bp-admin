@@ -1,0 +1,159 @@
+<!DOCTYPE html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Мої студенти · Teacher</title><meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--or:#ff6b3d;--or2:#fff1ea;--ink:#1f2a44;--mut:#7a8297;--line:#e6e9f0;--bg:#f5f7fb;--ok:#23824a;--ok2:#e7f6ec;--warn:#b26b00;--warn2:#fff4e0;--bad:#c0392b;--bad2:#fdecea;--blue:#3b5bdb;--blue2:#eef3ff}
+*{box-sizing:border-box;min-width:0}body{margin:0;font:15px/1.45 Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+a{color:inherit}button,input,select{font:inherit}
+header{background:#fff;border-bottom:1px solid var(--line);padding:14px max(3vw,14px);display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:22px}header nav{display:flex;gap:14px;flex-wrap:wrap}header nav a{text-decoration:none;color:var(--mut);font-weight:500}header nav a.on{color:var(--or)}
+header .r{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:0;background:var(--ink);color:#fff;border-radius:10px;padding:8px 14px;font-weight:500;cursor:pointer;min-height:38px}.btn.l{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn.or{background:var(--or)}
+.btn.s{padding:5px 10px;min-height:32px;font-size:13px}
+.wrap{padding:18px max(3vw,14px) 40px;max-width:1500px;margin:0 auto}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:16px}
+.sm{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;text-align:left}.sm b{display:block;font-size:26px;line-height:1.1}.sm span{color:var(--mut);font-size:13px}
+.sm.on{border-color:var(--or);box-shadow:0 0 0 2px var(--or2)}
+.bar1{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.bar1 input{border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:220px;background:#fff}
+.bar1 select{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.card.alert{border-color:#f3c4bd}
+.top{display:flex;gap:10px;align-items:center}.av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ff8a5c,#ff6b3d);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.top b{font-size:17px}.lv{font-size:12px;background:var(--blue2);color:var(--blue);border-radius:8px;padding:1px 7px;margin-left:6px;font-weight:600}
+.lk{margin-left:auto;display:flex;gap:6px}.lk a{text-decoration:none;font-size:18px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid var(--line)}
+.lk a:hover{background:var(--bg)}
+.row{display:grid;grid-template-columns:92px 1fr;gap:8px;align-items:start;font-size:14px}.row>i{font-style:normal;color:var(--mut);font-size:12.5px;padding-top:2px}
+.pill{display:inline-block;border-radius:8px;padding:1px 8px;font-size:12.5px;font-weight:600}
+.p-ok{background:var(--ok2);color:var(--ok)}.p-w{background:var(--warn2);color:var(--warn)}.p-b{background:var(--bad2);color:var(--bad)}.p-n{background:var(--bg);color:var(--mut)}
+.pay{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.pay b{font-size:20px}.pay input{width:58px;border:1px solid var(--line);border-radius:8px;padding:4px 6px}
+.hw{display:flex;flex-direction:column;gap:4px}.hl{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.hl a{text-decoration:none}.hl a:hover{text-decoration:underline}
+.sk{display:grid;grid-template-columns:76px 1fr 38px;gap:6px;align-items:center;font-size:12.5px}.sk .tr{height:8px;background:var(--bg);border-radius:4px;overflow:hidden}.sk .tr i{display:block;height:100%;border-radius:4px}
+.sk .v{text-align:right;color:var(--mut)}
+.mut{color:var(--mut)}.small{font-size:12.5px}
+.login{max-width:380px;margin:12vh auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px}.login input{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:10px;padding:9px 16px;display:none}
+.empty{color:var(--mut);padding:30px;text-align:center}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.row{grid-template-columns:80px 1fr}}
+</style></head><body>
+<header><h1>👩‍🏫 Мої студенти</h1>
+<nav><a class="on" href="students.html">Усі на одній сторінці</a><a href="cabinets.html">🎟 Кабінети (редагування)</a><a href="index.html">📝 Відповіді</a><a href="hub.html">🗂 Рівні</a></nav>
+<div class="r" id="hdr" hidden><button class="btn l" id="rf">↻ Оновити</button><button class="btn l" id="lo">Вийти</button></div></header>
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+{
+const SB="https://zuegojpfhgigsvyrnymt.supabase.co",SK="sb_publishable__Xn8xRhne9Hp2ckaXu6xCQ_MOe52bng";
+const rpc=(f,b)=>fetch(SB+"/rest/v1/rpc/"+f,{method:"POST",headers:{apikey:SK,"Content-Type":"application/json"},body:JSON.stringify(b)}).then(async r=>{const t=await r.text();if(!r.ok)throw new Error(t);return t?JSON.parse(t):null});
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let KEY="";try{KEY=localStorage.getItem("bp_admin_key")||""}catch(e){}
+let ALL=[],OVER=[],FILTER="all",Q="",SORT="next";
+const SKC={Vocabulary:"#3b7dd8",Grammar:"#7a4ad8",Reading:"#1f9254",Listening:"#d98a00",Writing:"#d1508c",Speaking:"#ff6b3d",Other:"#9aa1ad"};
+const toast=t=>{const e=$("toast");e.textContent=t;e.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display="none",2200)};
+
+function login(msg){$("hdr").hidden=true;$("app").innerHTML=`<form class="login" id="lf"><h2 style="margin:0">Вхід для вчителя</h2>${msg?`<p class="mut">${esc(msg)}</p>`:""}<input id="k" type="password" placeholder="Ключ" autocomplete="current-password"><button class="btn or">Увійти</button></form>`;
+ $("lf").onsubmit=e=>{e.preventDefault();KEY=$("k").value.trim();load()}}
+async function load(){if(!KEY)return login();
+ $("app").innerHTML='<p class="empty">Завантажую…</p>';
+ try{[ALL,OVER]=await Promise.all([rpc("admin_cabinets",{p_key:KEY}),rpc("admin_overview",{p_key:KEY})]);try{localStorage.setItem("bp_admin_key",KEY)}catch(e){}}
+ catch(e){KEY="";return login("Ключ не підійшов або немає з'єднання.")}
+ $("hdr").hidden=false;render();loadSkills()}
+
+// ---------- helpers ----------
+const now=()=>new Date();
+const short=l=>String(l||"").replace(/^BP\s+[A-Z0-9+]+\s+/,"").replace(/^GE\s+/,"");
+function frac(sc){let n=0,t=0;for(const k in (sc||{})){const m=String(sc[k]).match(/(\d+)\s*\/\s*(\d+)/);if(m){n+=+m[1];t+=+m[2]}}return t?[n,t]:null}
+function whenTxt(d){if(!d)return"";const x=new Date(d),t=now();const day=24*3600e3;const dd=Math.floor((new Date(x.toDateString())-new Date(t.toDateString()))/day);
+ const hm=x.toLocaleTimeString("uk-UA",{hour:"2-digit",minute:"2-digit"});
+ if(dd===0)return"сьогодні, "+hm;if(dd===1)return"завтра, "+hm;if(dd===-1)return"вчора, "+hm;
+ return x.toLocaleDateString("uk-UA",{weekday:"short",day:"numeric",month:"short"})+", "+hm}
+function info(c){
+ const hw=OVER.filter(h=>h.slug===c.slug).sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at));
+ const review=hw.filter(h=>h.submitted&&!h.has_comment);
+ const next=c.next_lesson?new Date(c.next_lesson):null;
+ const past=next&&next<now();
+ const week=next&&!past&&(next-now())<7*24*3600e3;
+ const low=c.payment!=="company"&&c.lessons_left!=null&&c.lessons_left<=2;
+ const due=c.homework_due?new Date(c.homework_due+"T23:59"):null;
+ const hwDone=c.homework_url?hw.some(h=>h.submitted&&c.homework_url&&pageMatches(c.homework_url,h.lesson)):false;
+ const overdue=due&&due<now()&&!hwDone&&c.homework;
+ return{hw,review,next,past,week,low,overdue,hwDone}}
+function pageMatches(url,lesson){const m=String(url).match(/lessons\/(\d+)-(\d+)/),l=String(lesson).match(/(\d+)\.(\d+)/);return!!(m&&l&&m[1]===l[1]&&m[2]===l[2])}
+
+// ---------- render ----------
+function render(){
+ const I=Object.fromEntries(ALL.map(c=>[c.slug,info(c)]));
+ const cnt={all:ALL.length,week:ALL.filter(c=>I[c.slug].week).length,review:ALL.filter(c=>I[c.slug].review.length).length,low:ALL.filter(c=>I[c.slug].low).length,late:ALL.filter(c=>I[c.slug].past||I[c.slug].overdue).length};
+ const S=[["all","Усі студенти","👥"],["week","Урок цього тижня","📅"],["review","Є домашка на перевірку","📝"],["low","Мало оплачених уроків","🎟"],["late","Потрібна увага","⚠️"]];
+ let list=ALL.filter(c=>FILTER==="all"||(FILTER==="week"&&I[c.slug].week)||(FILTER==="review"&&I[c.slug].review.length)||(FILTER==="low"&&I[c.slug].low)||(FILTER==="late"&&(I[c.slug].past||I[c.slug].overdue)));
+ if(Q)list=list.filter(c=>(c.name+" "+c.level+" "+c.slug).toLowerCase().includes(Q));
+ list.sort((a,b)=>SORT==="name"?a.name.localeCompare(b.name):SORT==="left"?((a.lessons_left??99)-(b.lessons_left??99)):((I[a.slug].next&&!I[a.slug].past?I[a.slug].next:new Date(9e15))-(I[b.slug].next&&!I[b.slug].past?I[b.slug].next:new Date(9e15))));
+ $("app").innerHTML=`<div class="sum">${S.map(([k,t,i])=>`<button class="sm ${FILTER===k?"on":""}" data-f="${k}"><b>${i} ${cnt[k]}</b><span>${t}</span></button>`).join("")}</div>
+ <div class="bar1"><input id="q" placeholder="🔍 Пошук студента" value="${esc(Q)}"><label class="mut small">Сортувати: <select id="so"><option value="next">за наступним уроком</option><option value="name">за ім'ям</option><option value="left">за залишком уроків</option></select></label></div>
+ <div class="grid">${list.map(c=>card(c,I[c.slug])).join("")||'<p class="empty">Нікого не знайдено.</p>'}</div>`;
+ $("so").value=SORT;bind()}
+function card(c,i){
+ const site=c.site_url||`https://villevian.github.io/bp-${c.slug}/`;
+ const nx=c.next_lesson?`<span class="pill ${i.past?"p-b":i.week?"p-ok":"p-n"}">${esc(whenTxt(c.next_lesson))}</span>${i.past?' <span class="small" style="color:var(--bad)">дата минула — онови</span>':""}${c.schedule?`<div class="small mut">${esc(c.schedule)}</div>`:""}`:`<span class="mut small">не вказано</span>${c.schedule?`<div class="small mut">${esc(c.schedule)}</div>`:""}`;
+ const pay=c.payment==="company"?`<span class="pill p-n">компанія</span>`:`<div class="pay"><b style="color:${i.low?"var(--bad)":"var(--ink)"}">${c.lessons_left??"—"}</b><span class="small mut">уроків${c.lesson_price?" · "+esc(c.lesson_price):""}</span>
+   <button class="btn l s" data-act="done" data-s="${esc(c.slug)}" title="Урок проведено: −1">✓ проведено −1</button>
+   <input type="number" min="1" value="4" id="n_${esc(c.slug)}" aria-label="Скільки уроків оплачено"><button class="btn l s" data-act="paid" data-s="${esc(c.slug)}">+ оплата</button></div>`;
+ const topic=c.current_lesson?(c.current_url?`<a href="${esc(c.current_url)}" target="_blank">${esc(c.current_lesson)}</a>`:esc(c.current_lesson)):'<span class="mut small">—</span>';
+ const hwSet=c.homework?`<div class="hl">${c.homework_url?`<a href="${esc(c.homework_url)}" target="_blank">${esc(c.homework)}</a>`:esc(c.homework)}${c.homework_due?` <span class="pill ${i.overdue?"p-b":"p-n"}">до ${esc(new Date(c.homework_due).toLocaleDateString("uk-UA",{day:"numeric",month:"short"}))}</span>`:""}${i.hwDone?' <span class="pill p-ok">здано</span>':""}</div>`:'<span class="mut small">не задано</span>';
+ const last=i.hw.slice(0,3).map(h=>{const f=frac(h.score);const pc=f?Math.round(f[0]/f[1]*100):null;
+   return `<div class="hl small"><a href="index.html#s/${esc(c.slug)}" title="Відкрити відповіді">${esc(short(h.lesson))}</a>
+   ${h.submitted?'<span class="pill p-ok">здано</span>':'<span class="pill p-w">чернетка</span>'}${pc!=null?` <span class="pill ${pc>=80?"p-ok":pc>=60?"p-w":"p-b"}">${pc}%</span>`:""}${h.has_comment?' 💬':h.submitted?' <span class="pill p-b">перевірити</span>':""}
+   <span class="mut">${esc(new Date(h.updated_at).toLocaleDateString("uk-UA",{day:"numeric",month:"short"}))}</span></div>`}).join("");
+ return `<div class="card ${i.past||i.overdue||i.low?"alert":""}">
+ <div class="top"><div class="av">${esc((c.name||"?")[0])}</div><div><b>${esc(c.name)}</b>${c.level?`<span class="lv">${esc(c.level)}</span>`:""}${c.last_done?`<div class="small mut">останній урок: ${esc(new Date(c.last_done).toLocaleDateString("uk-UA",{day:"numeric",month:"short"}))}</div>`:""}</div>
+  <div class="lk"><a href="${esc(site)}" target="_blank" title="Сайт студента">🏠</a><a href="index.html#s/${esc(c.slug)}" title="Відповіді">📝</a><a href="cabinets.html" title="Редагувати кабінет">✏️</a>${c.meet_url?`<a href="${esc(c.meet_url)}" target="_blank" title="Дзвінок">🎥</a>`:""}</div></div>
+ <div class="row"><i>Наступний урок</i><div>${nx}</div></div>
+ <div class="row"><i>Оплата</i><div>${pay}</div></div>
+ <div class="row"><i>Проходимо</i><div>${topic}</div></div>
+ <div class="row"><i>Задано</i><div class="hw">${hwSet}</div></div>
+ <div class="row"><i>Домашки${i.review.length?` <span class="pill p-b">${i.review.length}</span>`:""}</i><div class="hw">${last||'<span class="mut small">ще немає</span>'}</div></div>
+ <div class="row"><i>Навички</i><div id="sk_${esc(c.slug)}">${skillsHtml(c.slug)}</div></div>
+ ${c.private_note?`<div class="small mut">🔒 ${esc(c.private_note)}</div>`:""}</div>`}
+function bind(){
+ document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{FILTER=b.dataset.f;render()});
+ $("q").oninput=e=>{Q=e.target.value.trim().toLowerCase();const p=e.target.selectionStart;render();$("q").focus();$("q").setSelectionRange(p,p)};
+ $("so").onchange=e=>{SORT=e.target.value;render()};
+ document.querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{const s=b.dataset.s,act=b.dataset.act;b.disabled=true;
+  try{if(act==="done")await rpc("admin_lessons",{p_key:KEY,p_slug:s,p_kind:"done",p_delta:-1,p_note:""});
+   else{const n=Math.max(1,parseInt($("n_"+s).value)||0);await rpc("admin_lessons",{p_key:KEY,p_slug:s,p_kind:"paid",p_delta:n,p_note:""})}
+   [ALL,OVER]=await Promise.all([rpc("admin_cabinets",{p_key:KEY}),rpc("admin_overview",{p_key:KEY})]);render();toast(act==="done"?"Урок списано":"Оплату додано")}
+  catch(e){toast("Помилка: "+e.message.slice(0,80));b.disabled=false}})}
+
+// ---------- skills: score per part → skill label taken from the lesson page ----------
+let SKILLS={};let PMAP={};try{PMAP=JSON.parse(localStorage.getItem("bp_skillmap")||"{}")}catch(e){}
+function skillOf(t){t=(t||"").toLowerCase();
+ if(/listen|audio|video/.test(t))return"Listening";if(/read/.test(t))return"Reading";if(/writ|email|message/.test(t))return"Writing";
+ if(/vocab|words|review|lexis|phrases|collocation/.test(t))return"Vocabulary";if(/grammar|meaning|signal|practice|structure|tense/.test(t))return"Grammar";
+ if(/speak|lead-in|role|discuss/.test(t))return"Speaking";return"Other"}
+function candidates(c,lesson){const m=String(lesson).match(/(\d+)\.(\d+)/);if(!m)return[];const n=m[1]+"-"+m[2];
+ const base=(c.site_url||`https://villevian.github.io/bp-${c.slug}/`).replace(/index\.html$/,"").replace(/\/?$/,"/");
+ const fs=/extra/i.test(lesson)?["extra.html"]:/homework/i.test(lesson)?["hw.html","hw-standard.html"]:["lesson.html","hw.html","extra.html"];
+ const out=[];["all","all-classic","it"].forEach(t=>fs.forEach(f=>out.push(base+"lessons/"+n+"/"+t+"/"+f)));return out}
+async function partMap(c,lesson){const ck=lesson;if(PMAP[ck])return PMAP[ck];
+ for(const u of candidates(c,lesson)){try{const r=await fetch(u,{cache:"no-cache"});if(!r.ok)continue;const t=await r.text();const L=(t.match(/LESSON\s*=\s*"([^"]+)"/)||[])[1];if(L!==lesson)continue;
+  const doc=new DOMParser().parseFromString(t,"text/html");const map={};
+  doc.querySelectorAll("[data-k]").forEach(el=>{const p=el.dataset.k.replace(/_[^_]+$/,"");if(map[p])return;const sec=el.closest("section");
+   const lab=sec?((sec.querySelector(".bsec")||{}).textContent||"")+" "+((sec.querySelector(".ins")||{}).textContent||""):"";map[p]=skillOf(lab)});
+  PMAP[ck]=map;try{localStorage.setItem("bp_skillmap",JSON.stringify(PMAP))}catch(e){}return map}catch(e){}}
+ return PMAP[ck]={}}
+async function loadSkills(){
+ for(const c of ALL){const agg={};
+  for(const h of OVER.filter(h=>h.slug===c.slug&&h.score)){const mp=await partMap(c,h.lesson);
+   for(const p in h.score){const m=String(h.score[p]).match(/(\d+)\s*\/\s*(\d+)/);if(!m)continue;const s=mp[p]||"Other";agg[s]=agg[s]||[0,0];agg[s][0]+=+m[1];agg[s][1]+=+m[2]}}
+  SKILLS[c.slug]=agg;const el=$("sk_"+c.slug);if(el)el.innerHTML=skillsHtml(c.slug)}}
+function skillsHtml(slug){const a=SKILLS[slug];if(!a)return'<span class="mut small">рахую…</span>';
+ const ks=Object.keys(a).filter(k=>a[k][1]).sort((x,y)=>a[y][1]-a[x][1]);if(!ks.length)return'<span class="mut small">ще немає даних</span>';
+ return ks.map(k=>{const p=Math.round(a[k][0]/a[k][1]*100);return`<div class="sk"><span>${k}</span><div class="tr"><i style="width:${p}%;background:${SKC[k]}"></i></div><span class="v">${p}%</span></div>`}).join("")}
+
+$("rf").onclick=()=>{PMAP={};try{localStorage.removeItem("bp_skillmap")}catch(e){};SKILLS={};load()};
+$("lo").onclick=()=>{KEY="";try{localStorage.removeItem("bp_admin_key")}catch(e){};login()};
+load();
+}
+</script></body></html>
