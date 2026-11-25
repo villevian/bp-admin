@@ -48,7 +48,11 @@
     if (S) return S; let a = null;
     if (PCODE) { try { const r = await rpc("get_my_hw", { p_code: PCODE, p_lesson: LKEY }); a = r && r[0] && r[0].answers; } catch (e) {} }
     if (!a) { try { a = JSON.parse(localStorage.getItem(lsKey()) || "null"); } catch (e) {} }
-    S = Object.assign({ sel: [], lv: {}, due: {}, own: [], del: [] }, a || {}); return S;
+    S = Object.assign({ sel: [], lv: {}, due: {}, own: [], del: [], chg: {} }, a || {}); S.chg = S.chg || {}; return S;
+  }
+  function mergeSel(R, L) { // last change wins per word (add / remove), so a removal is not undone by the other device
+    const chg = Object.assign({}, R.chg || {}); for (const k in (L.chg || {})) if (!chg[k] || L.chg[k][1] > chg[k][1]) chg[k] = L.chg[k];
+    const set = new Set([...(R.sel || []), ...(L.sel || [])]); for (const k in chg) { if (chg[k][0]) set.add(k); else set.delete(k); } return { sel: [...set], chg };
   }
   async function saveS() {
     try { localStorage.setItem(lsKey(), JSON.stringify(S)); } catch (e) {}
@@ -57,7 +61,7 @@
       const r = await rpc("get_my_hw", { p_code: PCODE, p_lesson: LKEY }); const R = (r && r[0] && r[0].answers) || {};
       const del = new Set([...(R.del || []), ...(S.del || [])]), own = {};
       [...(R.own || []), ...(S.own || [])].forEach(w => { if (!del.has(w.id)) own[w.id] = w; });
-      S = Object.assign({}, R, { sel: [...new Set([...(R.sel || []), ...(S.sel || [])])], own: Object.values(own), del: [...del], lv: Object.assign({}, S.lv, R.lv), due: Object.assign({}, S.due, R.due) });
+      S = Object.assign({}, R, mergeSel(R, S), { own: Object.values(own), del: [...del], lv: Object.assign({}, S.lv, R.lv), due: Object.assign({}, S.due, R.due) });
       const mastered = Object.values(S.lv || {}).filter(v => v >= 4).length;
       await rpc("save_hw", { p_code: PCODE, p_lesson: LKEY, p_answers: S, p_score: { selected: S.sel.length, own: S.own.length, mastered }, p_submitted: false });
       return true;
@@ -77,7 +81,7 @@
       <div class="vk-en">${esc(it.en)} <button class="vk-b" data-say="en">🔊</button></div>${it.uk ? `<div class="vk-uk">${esc(it.uk)}</div>` : ""}
       ${it.df ? `<div class="vk-lb">Meaning</div><div>${esc(it.df)}</div>` : ""}
       ${it.ex ? `<div class="vk-lb">Example</div><div class="vk-ex">${esc(it.ex)} <button class="vk-b" style="padding:1px 8px" data-say="ex">🔊</button></div>` : ""}
-      <div class="vk-row"><button class="vk-b ${mine ? "ok" : "a"}" id="vkAdd">${mine ? "★ In my vocabulary" : "＋ My vocabulary"}</button>
+      <div class="vk-row"><span><button class="vk-b ${mine ? "ok" : "a"}" id="vkAdd">${mine ? "★ In my vocabulary" : "＋ My vocabulary"}</button>${mine ? ' <button class="vk-b" id="vkDel" title="Remove from My vocabulary">✕ Remove</button>' : ""}</span>
       <div class="vk-nav">${LIST.length > 1 ? '<button class="vk-b" data-go="-1">←</button><button class="vk-b" data-go="1">→</button>' : ""}</div></div>`;
     const box = document.getElementById("vkBox");
     box.querySelector(".x").onclick = close;
@@ -85,8 +89,16 @@
     box.querySelectorAll("[data-go]").forEach(b => b.onclick = () => card(cur + +b.dataset.go));
     document.getElementById("vkAdd").onclick = async () => {
       await loadS(); if (inMine(it)) return;
-      if (it.id) S.sel.push(it.id); else { const w = { id: "own|" + Date.now(), en: it.en, uk: it.uk || "", ex: it.ex || "", src: (NUM + " " + TITLE).trim(), at: new Date().toISOString() }; S.own.push(w); S.sel.push(w.id); }
+      const now = Date.now();
+      if (it.id) { S.sel.push(it.id); S.chg[it.id] = [1, now]; } else { const w = { id: "own|" + now, en: it.en, uk: it.uk || "", ex: it.ex || "", src: (NUM + " " + TITLE).trim(), at: new Date().toISOString() }; S.own.push(w); S.sel.push(w.id); S.chg[w.id] = [1, now]; }
       const ok = await saveS(); toast(ok ? "★ Added to My vocabulary" : "Saved on this device"); markChips(); card(cur);
+    };
+    const del = document.getElementById("vkDel");
+    if (del) del.onclick = async () => {
+      await loadS(); const now = Date.now();
+      const ids = [it.id, ...S.own.filter(w => norm(w.en) === norm(it.en)).map(w => w.id)].filter(Boolean);
+      ids.forEach(id => { S.sel = S.sel.filter(x => x !== id); S.chg[id] = [0, now]; if (/^own\|/.test(id)) { S.own = S.own.filter(w => w.id !== id); S.del = [...new Set([...(S.del || []), id])]; } });
+      const ok = await saveS(); toast(ok ? "Removed from My vocabulary" : "Removed on this device"); markChips(); card(cur);
     };
     ov.classList.add("on");
   }
