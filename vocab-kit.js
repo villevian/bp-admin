@@ -107,7 +107,7 @@
   function findItem(text) {
     const n = norm(text), s = stem(text);
     return DATA.items.find(x => norm(x.en) === n) || DATA.items.find(x => stem(x.en) === s) ||
-      DATA.items.find(x => norm(x.en).split(" / ").map(norm).includes(n)) || null;
+      DATA.items.find(x => String(x.en).split(/ \/ | – | - /).map(norm).includes(n)) || DATA.items.find(x => String(x.en).split(/ \/ | – | - /).map(stem).includes(s)) || null;
   }
   let CHIPS = [];
   function initChips() {
