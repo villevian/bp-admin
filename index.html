@@ -206,8 +206,14 @@ async function openDetail(slug,lesson){
  let d;try{d=(await rpc("admin_get",{p_key:KEY,p_slug:slug,p_lesson:lesson}))[0]}catch(e){det.innerHTML=`<p class="err">${esc(e.message)}</p>`;return}
  if(!d){det.innerHTML="";return}
  const groups=groupAnswers(Object.fromEntries(Object.entries(d.answers||{}).filter(([k])=>!k.startsWith("_"))));
- let ctxHtml=renderCtx(d.answers);
- if(!ctxHtml&&d.answers){const pg=await pageFor(slug,lesson,s&&s.track);if(pg){const r=ctxFromPage(pg.html);ctxHtml=renderCtx(d.answers,r.C,pg.url,r.ans)}}
+ let ctxHtml=renderCtx(d.answers);let pgUrl=d.answers&&d.answers._page;
+ if(!ctxHtml&&d.answers){const pg=await pageFor(slug,lesson,s&&s.track);if(pg){pgUrl=pgUrl||pg.url;const r=ctxFromPage(pg.html);ctxHtml=renderCtx(d.answers,r.C,pg.url,r.ans)}}
+ if(!pgUrl&&d.answers){const pg=await pageFor(slug,lesson,s&&s.track);if(pg)pgUrl=pg.url}
+ if(pgUrl){try{const t=await fetch(pgUrl,{cache:"no-store"}).then(r=>r.text());if(!t.includes("teacherView"))pgUrl=null}catch(e){pgUrl=null}}
+ if(pgUrl){window.__tv={answers:d.answers,submitted:d.submitted,name:s?s.name:slug};
+  ctxHtml='<p class="note">Сторінка так, як її бачить студент: усі кроки підряд, його відповіді, перевірки й модельні відповіді. Нічого не змінюється. <a href="'+esc(pgUrl)+'" target="_blank">Відкрити окремо ↗</a></p>'+
+   '<iframe id="tvf" src="'+esc(pgUrl)+'?view=1" style="width:100%;height:900px;border:1px solid #ddd;border-radius:10px;background:#fff"></iframe>'+
+   (ctxHtml?'<details style="margin-top:10px"><summary>Коротко списком</summary>'+ctxHtml+'</details>':'')}
  det.innerHTML=`<div class="detail"><h3>${esc(s?s.name:slug)} · ${esc(short(lesson))}</h3>
  <div class="meta">${d.submitted?"✓ Надіслано вчителю":"Ще в процесі"} · оновлено ${fmtDate(d.updated_at)}</div>
  <div class="scores">${d.score?Object.entries(d.score).map(([k,v])=>`<span>${esc(k.replace(/^e/,"Ex "))}: <b>${esc(v)}</b></span>`).join(""):""}</div>
@@ -218,5 +224,8 @@ async function openDetail(slug,lesson){
  document.getElementById("sv").onclick=async()=>{const m=document.getElementById("svm");try{await rpc("admin_comment",{p_key:KEY,p_slug:slug,p_lesson:lesson,p_comment:document.getElementById("cm").value});m.innerHTML='<span class="ok">✓ Збережено</span>';const o=OVER.find(x=>x.slug===slug&&x.lesson===lesson);if(o)o.has_comment=!!document.getElementById("cm").value.trim()}catch(e){m.innerHTML='<span class="err">Помилка</span>'}};
  
 }
+addEventListener("message",e=>{const f=document.getElementById("tvf");if(!f||e.source!==f.contentWindow)return;
+ if(e.data&&e.data.tvReady&&window.__tv)f.contentWindow.postMessage({tv:window.__tv},"*");
+ if(e.data&&e.data.tvHeight)f.style.height=Math.max(600,e.data.tvHeight+30)+"px"});
 load();
 </script></body></html>

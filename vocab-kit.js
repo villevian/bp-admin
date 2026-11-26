@@ -5,6 +5,7 @@
    Data: <site>/vocab.json ({level, items:[{id,l,g,en,uk,df,ex}]}); student code = global CODE of the page (or data-code).
    Storage: Supabase "Business Partner", save_hw / get_my_hw, lesson key "BP <LEVEL> Vocabulary" (same as vocab.html). */
 (function () {
+  if (new URLSearchParams(location.search).has("view")) return;
   if (window.__vkit) return; window.__vkit = 1;
   const me = document.currentScript || document.querySelector('script[src*="vocab-kit.js"]');
   const SB = "https://zuegojpfhgigsvyrnymt.supabase.co", KEY = "sb_publishable__Xn8xRhne9Hp2ckaXu6xCQ_MOe52bng";
